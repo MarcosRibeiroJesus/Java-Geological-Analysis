@@ -8,9 +8,7 @@ import java.util.List;
 
 //Unfolding libraries
 import de.fhpotsdam.unfolding.UnfoldingMap;
-import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
-import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
@@ -26,7 +24,7 @@ import processing.core.PApplet;
  * earthquake data. Author: UC San Diego Intermediate Software Development MOOC
  * team
  * 
- * @author Your name here Date: July 17, 2015
+ * @author Marcos Ribeiro: January 24, 2020
  */
 public class EarthquakeCityMap extends PApplet {
 
@@ -48,6 +46,11 @@ public class EarthquakeCityMap extends PApplet {
 	public static final float THRESHOLD_MODERATE = 5;
 	// Less than this threshold is a minor earthquake
 	public static final float THRESHOLD_LIGHT = 4;
+
+	/** Greater than or equal to this threshold is an intermediate depth */
+	public static final float THRESHOLD_INTERMEDIATE = 70;
+	/** Greater than or equal to this threshold is a deep depth */
+	public static final float THRESHOLD_DEEP = 300;
 
 	/**
 	 * This is where to find the local tiles, for working without an Internet
@@ -83,37 +86,15 @@ public class EarthquakeCityMap extends PApplet {
 		// PointFeatures have a getLocation method
 		List<PointFeature> earthquakes = ParseFeed.parseEarthquake(this, earthquakesURL);
 
-		System.out.println(earthquakes);
-
-		for (PointFeature earthquake : earthquakes) {
-			System.out.println(earthquake);
-			createMarker(earthquake);
-//			markers.add(earthquake);
-		}
-
 		// TODO (Step 3): Add a loop here that calls createMarker (see below)
 		// to create a new SimplePointMarker for each PointFeature in
 		// earthquakes. Then add each new SimplePointMarker to the
 		// List markers (so that it will be added to the map in the line below)
+		for (PointFeature earthquake : earthquakes) {
+			createMarker(earthquake);
+		}
 
 		// Add the markers to the map so that they are displayed
-//		Location valLoc1 = new Location(-38.142, -73.03f);
-//		Feature valLoc1eq = new PointFeature(valLoc1);
-//		valLoc1eq.addProperty("title", "Valdivia, Chile");
-//		valLoc1eq.addProperty("magnitude", "9.5");
-//		valLoc1eq.addProperty("date", "May 22, 1960");
-//		valLoc1eq.addProperty("year", "1960");
-//
-//		Marker val1 = new SimplePointMarker(valLoc1, valLoc1eq.getProperties());
-//		val1.setColor(yellow);
-//
-//		Location valLoc2 = new Location(-15.774312, -47.7794466);
-//		Marker val2 = new SimplePointMarker(valLoc2);
-//		val2.setColor(red);
-//
-//		markers.add(val1);
-//		markers.add(val2);
-
 		map.addMarkers(markers);
 	}
 
@@ -131,19 +112,13 @@ public class EarthquakeCityMap extends PApplet {
 		// To print all of the features in a PointFeature (so you can see what they are)
 		// uncomment the line below. Note this will only print if you call createMarker
 		// from setup
-		System.out.println(feature.getProperties());
+//		System.out.println(feature.getProperties());
 
 		// Create a new SimplePointMarker at the location given by the PointFeature
 		SimplePointMarker marker = new SimplePointMarker(feature.getLocation());
-		
-		System.out.println(">>>>>>:");
-		
+
 		Object magObj = feature.getProperty("magnitude");
 		float mag = Float.parseFloat(magObj.toString());
-
-		// Here is an example of how to use Processing's color method to generate
-		// an int that represents the color yellow.
-		int yellow = color(255, 255, 0);
 
 		// TODO (Step 4): Add code below to style the marker's size and color
 		// according to the magnitude of the earthquake.
@@ -152,9 +127,20 @@ public class EarthquakeCityMap extends PApplet {
 		// Rather than comparing the magnitude to a number directly, compare
 		// the magnitude to these variables (and change their value in the code
 		// above if you want to change what you mean by "moderate" and "light")
-//		for (marker.)
-//			
-//			this.markers.add(marker);
+		if (mag <= THRESHOLD_LIGHT) {
+			marker.setColor(blue);
+			marker.setRadius(2 * mag * 1.75f);
+		}
+		if (mag > THRESHOLD_LIGHT && mag < THRESHOLD_MODERATE) {
+			marker.setColor(yellow);
+			marker.setRadius(2 * mag * 1.75f);
+		}
+		if (mag >= THRESHOLD_MODERATE) {
+			marker.setColor(red);
+			marker.setRadius(2 * mag * 1.95f);
+		}
+
+		this.markers.add(marker);
 
 		// Finally return the marker
 		return marker;
