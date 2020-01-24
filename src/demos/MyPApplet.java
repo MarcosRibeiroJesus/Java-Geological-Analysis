@@ -29,7 +29,6 @@ public class MyPApplet extends PApplet{
 		int[] color = sunColorSec(second());		//calculate color code for sun
 		fill(color[0],color[1],color[2]);	//set sun color
 		ellipse(width/5,height/5,width/5,height/5);	//draw sun
-		
 	}
 	
 	/** Return the RGB color of the sun at this number of seconds in the minute */
